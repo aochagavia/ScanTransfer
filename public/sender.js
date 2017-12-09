@@ -1,5 +1,4 @@
 let sendButton = null;
-let messageInputBox = null;
 
 let localConnection = null;
 let sendChannel = null;
@@ -8,8 +7,6 @@ window.addEventListener('load', startup, false);
 
 function startup() {
   sendButton = document.getElementById('sendButton');
-  messageInputBox = document.getElementById('message');
-  receiveBox = document.getElementById('receivebox');
 
   sendButton.addEventListener('click', sendMessage, false);
 
@@ -67,28 +64,14 @@ function sendMessage() {
     sendChannel.send(reader.result);
   };
   reader.readAsArrayBuffer(selectedFile);
-
-  //sendChannel.send(messageInputBox.value);
-
-  // Clear the input box and re-focus it, so that we're
-  // ready for the next message.
-  messageInputBox.value = "";
-  messageInputBox.focus();
-
-  //var reader = new FileReader();
-  //reader.readAsArrayBuffer(selectedFile);
-
 }
 
 function statusChange(event) {
   let state = sendChannel.readyState;
   console.log('state changed: ' + state);
   if (state === "open") {
-    messageInputBox.disabled = false;
-    messageInputBox.focus();
     sendButton.disabled = false;
   } else {
-    messageInputBox.disabled = true;
     sendButton.disabled = true;
   }
 }

@@ -1,8 +1,6 @@
 window.addEventListener('load', startup, false);
 
 function startup() {
-  let receiveBox = document.getElementById('receivebox');
-
   socket.emit('register_receiver');
   socket.on('uuid', uuid => {
     new QRious({
