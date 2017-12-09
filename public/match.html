@@ -23,9 +23,10 @@
       scanner.addListener('scan', content => {
         // Ignore repeated scans
         if (codes.includes(content)) return;
+        alert('Match');
         codes.push(content);
         if (codes.length === 2) {
-          socket.emit('match', { a: codes[0], b: codes[1] });
+          socket.emit('match_sender_receiver', { a: codes[0], b: codes[1] });
           alert('match sent: ' + codes[0] + ' - ' + codes[1]);
         }
       });
