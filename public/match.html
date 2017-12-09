@@ -13,14 +13,17 @@
   <h1>Matcher</h1>
   <video id="preview"></video>
   <script>
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+      let config = {
+        video: document.getElementById('preview'),
+        mirror: false,
+        scanPeriod: 5
+      };
+      let scanner = new Instascan.Scanner(config);
       let codes = [];
-      scanner.addListener('scan', function (content) {
-        // Note: the scanner seems to filter out repeated scans, which is great
-        console.log(content);
-        if (codes.find(content)) return;
+      scanner.addListener('scan', content => {
+        // Ignore repeated scans
+        if (codes.includes(content)) return;
         codes.push(content);
-        alert('match');
         if (codes.length === 2) {
           socket.emit('match', { a: codes[0], b: codes[1] });
           alert('match sent: ' + codes[0] + ' - ' + codes[1]);
@@ -30,10 +33,10 @@
         if (cameras.length > 0) {
           scanner.start(cameras[0]);
         } else {
-          console.error('No cameras found.');
+          alert('No cameras found.');
         }
       }).catch(function (e) {
-        console.error(e);
+        alert('Error: ' + e);
       });
   </script>
   <input type="text" id="a">
