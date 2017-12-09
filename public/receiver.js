@@ -36,12 +36,17 @@ function startup() {
 
   receiverConnection.ondatachannel = event => {
     let receiveChannel = event.channel;
+    let download = document.getElementById('download');
     receiveChannel.onmessage = event => {
-      let el = document.createElement("p");
-      let txtNode = document.createTextNode(event.data);
-
-      el.appendChild(txtNode);
-      receiveBox.appendChild(el);
+      if (typeof(event.data) === 'string') {
+        // File name
+        download.setAttribute('download', event.data);
+      } else {
+        // File as an ArrayBuffer
+        let url = URL.createObjectURL(event.data);
+        console.log('File received: ' + url);
+        download.setAttribute('href', url);
+      }
     };
     receiveChannel.onopen = () => {
       console.log('Receive channel is open!');

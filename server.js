@@ -16,10 +16,13 @@ let senderToSocket = {};
 
 // Websocket stuff to setup WebRTC communication
 io.on('connection', function(socket){
+  // Initially, we don't know whether this is a sender or a receiver
   socket.on('disconnect', () => {
     // FIXME: remove pairing
 
     // FIXME: remove the rest
+
+    console.log('user disconnected');
   });
 
   socket.on('register_receiver', () => {

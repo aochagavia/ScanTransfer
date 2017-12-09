@@ -58,12 +58,26 @@ function connect() {
 }
 
 function sendMessage() {
-  sendChannel.send(messageInputBox.value);
+  var selectedFile = document.getElementById('file').files[0];
+  console.log(selectedFile);
+  let reader = new FileReader();
+  reader.onloadend = () => {
+    console.log('File loaded');
+    sendChannel.send(selectedFile.name);
+    sendChannel.send(reader.result);
+  };
+  reader.readAsArrayBuffer(selectedFile);
+
+  //sendChannel.send(messageInputBox.value);
 
   // Clear the input box and re-focus it, so that we're
   // ready for the next message.
   messageInputBox.value = "";
   messageInputBox.focus();
+
+  //var reader = new FileReader();
+  //reader.readAsArrayBuffer(selectedFile);
+
 }
 
 function statusChange(event) {
