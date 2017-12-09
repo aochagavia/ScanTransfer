@@ -1,7 +1,7 @@
 {
   "name": "ScanTransfer",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "author": "Adolfo Ochagavía",
   "license": "MIT",
   "dependencies": {
