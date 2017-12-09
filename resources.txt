@@ -1,0 +1,4 @@
+Send data from browser to browser:
+* Note WebRTC is the API to establish connections between browsers
+* https://www.html5rocks.com/en/tutorials/webrtc/basics/
+* https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Simple_RTCDataChannel_sample

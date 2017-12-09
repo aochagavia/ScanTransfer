@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <title>Sender</title>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script>
+  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  <script>var socket = io('http://localhost:3000');</script>
+  <script src="sender.js"></script>
+</head>
+<body>
+  <h1>Sender</h1>
+
+  <canvas id="qr"></canvas>
+  <div class="messagebox">
+    <label for="message">Enter a message:
+      <input type="text" name="message" id="message" placeholder="Message text"
+              inputmode="latin" size=60 maxlength=120 disabled>
+    </label>
+    <button id="sendButton" name="sendButton" class="buttonright" disabled>
+      Send
+    </button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "ScanTransfer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Adolfo Ochagavía",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4",
+    "uuid": "^3.1.0"
+  }
+}
