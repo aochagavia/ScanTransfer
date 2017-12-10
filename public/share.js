@@ -1,10 +1,12 @@
 let sendButton = null;
 let channel = null;
+let download = null;
 
 window.addEventListener('load', startup, false);
 
 function startup() {
   sendButton = document.getElementById('sendButton');
+  download = document.getElementById('download');
 
   sendButton.addEventListener('click', sendMessage, false);
 
@@ -43,42 +45,36 @@ socket.on('sender_description', desc => {
   .then(() => socket.emit('receiver_description', connection.localDescription));
 });
 
-// This code is used when the client acts as a receiver
+// Used when the client acts as a receiver
+// Note that this event is only called when the data channel has been created by the other party
 connection.ondatachannel = event => {
-  console.log('Data channel opened');
-  let download = document.getElementById('download');
-  channel = event.channel;
-  channel.onmessage = receiveMessage;
-  channel.onopen = statusChange;
-  channel.onclose = statusChange;
+  initChannel(event.channel);
 };
 
 // A match has been found and this client has been arbitrarily chosen to
 // initiate the connection
 socket.on('match_found', () => {
-  // FIXME: figure out whether the code below is necessary
-  // Disable the ondatachannel event, just in case
-  connection.ondatachannel = undefined;
-
-  // Create the data channel and establish its event listeners
-  channel = connection.createDataChannel("channel");
-  channel.onmessage = receiveMessage;
-  channel.onopen = statusChange;
-  channel.onclose = statusChange;
+  // Create the data channel
+  let c = connection.createDataChannel("channel");
+  initChannel(c);
 
   // Create an offer to connect
   connection.createOffer()
   .then(offer => connection.setLocalDescription(offer))
   .then(() => socket.emit('sender_description', connection.localDescription));
 
-  console.log('Sent offer with own description');
-
   // Finish setting up stuff using the receiver's description
   socket.on('receiver_description', desc => {
-    console.log('Received counterpart descr');
     connection.setRemoteDescription(desc)
   });
 });
+
+function initChannel(c) {
+  channel = c;
+  channel.onmessage = receiveMessage;
+  channel.onopen = statusChange;
+  channel.onclose = statusChange;
+}
 
 function receiveMessage(event) {
   if (typeof(event.data) === 'string') {
