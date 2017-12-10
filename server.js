@@ -3,95 +3,100 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const uuidv4 = require('uuid/v4');
+const HashMap = require('hashmap');
 
 // Hashmaps to handle pairing
-let senderToReceiver = {};
-let receiverToSender = {};
+let clientToClient = new HashMap();
 
 // Hashmaps related to ids and sockets
-let receiverToSocket = {};
-let receiverToId = {};
-let senderToId = {};
-let senderToSocket = {};
+let clientIdToSocket = new HashMap();
+let socketToClientId = new HashMap();
 
 // Websocket stuff to setup WebRTC communication
-io.on('connection', function(socket){
-  // Initially, we don't know whether this is a sender or a receiver
+io.on('connection', socket => {
+  console.log('Client connected');
+
   socket.on('disconnect', () => {
-    // FIXME: remove pairing
-
-    // FIXME: remove the rest
-
-    console.log('user disconnected');
-  });
-
-  socket.on('register_receiver', () => {
-    let id = uuidv4();
-    receiverToId[socket] = id;
-    receiverToSocket[id] = socket;
-
-    socket.emit('uuid', id);
-    console.log('Receiver registered with id: ' + id);
-  });
-
-  socket.on('register_sender', () => {
-    let id = uuidv4();
-    senderToId[socket] = id;
-    senderToSocket[id] = socket;
-
-    socket.emit('uuid', id);
-    console.log('Sender registered with id: ' + id);
-  });
-
-  socket.on('match_sender_receiver', ids => {
-    console.log(`matching: ${ids.a} and ${ids.b}`);
-
-    // We expect two ids: a and b
-    // They can point to a sender or a receiver, we don't care, because we use UUIDs
-
-    // Check whether a corresponds to a sender
-    let senderId = null;
-    let receiverId = null;
-    if (senderToSocket[ids.a] !== undefined) {
-      senderId = ids.a;
-      receiverId = ids.b;
-    } else {
-      senderId = ids.b;
-      receiverId = ids.a;
+    // Remove registered sockets
+    if (socketToClientId.has(socket)) {
+      let id = socketToClientId.get(socket);
+      socketToClientId.delete(socket);
+      clientIdToSocket.delete(id);
     }
 
-    let sender = senderToSocket[senderId];
-    let receiver = receiverToSocket[receiverId];
+    // Remove pairing, if any
+    if (clientToClient.has(socket)) {
+      let counterpart = clientToClient.get(socket);
+      clientToClient.delete(socket);
+      clientToClient.delete(counterpart);
+    }
 
-    if (!sender || !receiver) {
-      socket.emit('match_error', 'invalid QR code');
+    console.log('Client disconnected');
+  });
+
+  socket.on('register', () => {
+    let id = uuidv4();
+    clientIdToSocket.set(id, socket);
+    socketToClientId.set(socket, id);
+    socket.emit('uuid', id);
+    console.log('Client registered: ' + id);
+  });
+
+  socket.on('attempt_match', ids => {
+    function logMatchError(msg) {
+      socket.emit('match_error', msg);
+      console.log(`Match error: ${msg}`);
+    }
+    if (!ids.length) {
+      logMatchError('Invalid parameter');
+      return;
+    }
+    if (ids.length !== 2) {
+      logMatchError(`Id list has ${ids.length} elements`)
       return;
     }
 
-    senderToReceiver[sender] = receiver;
-    receiverToSender[receiver] = sender;
+    let [idA, idB] = ids;
+    if (idA === idB) {
+      logMatchError('Ids are equal');
+      return;
+    }
 
-    sender.emit('match');
+    let socketA = clientIdToSocket.get(idA);
+    let socketB = clientIdToSocket.get(idB);
+    if (!socketA) {
+      logMatchError(`No client with id ${idA}`);
+      return;
+    }
+    if (!socketB) {
+      logMatchError(`No client with id ${idB}`);
+    }
+
+    clientToClient.set(socketA, socketB);
+    clientToClient.set(socketB, socketA);
+
+    console.log(`Match: ${idA} and ${idB}`);
+
+    // Arbitrarily, the first scanned socket will initiate the connection
+    socketA.emit('match_found');
   });
 
-  // Sent by receiver
-  socket.on('receiver_ice', candidate => {
-    receiverToSender[socket].emit('receiver_ice', candidate);
+  function getCounterpart(s) {
+    return clientToClient.get(s);
+  }
+
+  socket.on('send_ice_candidate', candidate => {
+    getCounterpart(socket).emit('recv_ice_candidate', candidate);
   });
 
   // Sent by receiver
   socket.on('receiver_description', desc => {
-    receiverToSender[socket].emit('receiver_description', desc);
-  })
-
-  // Sent by sender
-  socket.on('sender_ice', candidate => {
-    senderToReceiver[socket].emit('sender_ice', candidate);
+    getCounterpart(socket).emit('receiver_description', desc);
   });
 
   // Sent by sender
   socket.on('sender_description', desc => {
-    senderToReceiver[socket].emit('sender_description', desc);
+    getCounterpart(socket).emit('sender_description', desc);
   });
 });
 

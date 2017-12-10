@@ -11,24 +11,28 @@ Stage 1 (done)
 Give senders and receivers an id
 Match senders and receivers from a different tab
 
-Stage 2 (todo)
+Stage 2 (done)
 ==============
 
 Display a QR code on the sender and receiver tab
 Scan a QR code on the match tab. Send the resulting match
 
-Notes:
-* Scan: https://github.com/schmich/instascan
-* Make sure we ignore successive reads of the same qr code
-
-Stage 3 (todo)
-==============
-
-Automatically send a string upon connection
-Automatically send a .txt file upon connection
-
-Stage 4 (todo)
+Stage 3 (done)
 ==============
 
 Allow specifying a file to the sender
 Send that file upon matching
+
+Stage 4 (done)
+==============
+
+Remove the distinction between sender and receiver
+Use matching to establish a connection
+
+Stage 5 (todo)
+==============
+
+Design:
+* Clearly show the status of the connection
+* Drag and drop files, send automatically
+* Show a list of received files

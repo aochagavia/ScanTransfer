@@ -2,12 +2,12 @@ window.addEventListener('load', startup, false);
 
 // For debugging
 function send_match(a, b) {
-    socket.emit('match_sender_receiver', { a, b });
+    socket.emit('attempt_match', [a, b]);
 }
 
 function startup() {
-    socket.on('match_error', () => {
-        console.log('match error');
+    socket.on('match_error', e => {
+        console.log(`match error: ${e}`);
     });
 
     // Get Instascan running
@@ -24,7 +24,7 @@ function startup() {
         alert('Match');
         codes.push(content);
         if (codes.length === 2) {
-            socket.emit('match_sender_receiver', { a: codes[0], b: codes[1] });
+            socket.emit('attempt_match', codes);
         }
     });
     Instascan.Camera.getCameras().then(function (cameras) {

@@ -7,17 +7,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.js"></script>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
   <script>var socket = io();</script>
-  <script src="sender.js"></script>
+  <script src="share.js"></script>
 </head>
 <body>
-  <h1>Sender</h1>
+  <h1>Share</h1>
 
   <canvas id="qr"></canvas>
-  <div class="messagebox">
+  <div class="sent">
     <input type="file" id="file">
     <button id="sendButton" name="sendButton" class="buttonright" disabled>
       Send
     </button>
+  </div>
+  <div class="received">
+    <p><a href="#" id="download">Download</a></p>
   </div>
 </body>
 </html>
