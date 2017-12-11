@@ -1,12 +1,14 @@
 let sendButton = null;
 let channel = null;
-let download = null;
+let sentFiles = null;
+let receivedFiles = null;
 
 window.addEventListener('load', startup, false);
 
 function startup() {
   sendButton = document.getElementById('sendButton');
-  download = document.getElementById('download');
+  sentFiles = document.getElementById('sentFiles');
+  receivedFiles = document.getElementById('receivedFiles');
 
   sendButton.addEventListener('click', sendMessage, false);
 
@@ -76,16 +78,26 @@ function initChannel(c) {
   channel.onclose = statusChange;
 }
 
+let receiving = null;
 function receiveMessage(event) {
   if (typeof(event.data) === 'string') {
     // File name
-    download.setAttribute('download', event.data);
+    receiving = event.data;
   } else {
     // File as an ArrayBuffer
     let url = URL.createObjectURL(event.data);
     console.log('File received: ' + url);
-    download.setAttribute('href', url);
+
+    let link = `<li><a href="${url}" download="${receiving}">${receiving}</a></li>`;
+    receivedFiles.appendChild(htmlToElement(link));
   }
+}
+
+// From https://stackoverflow.com/a/35385518/2110623
+function htmlToElement(html) {
+  var template = document.createElement('template');
+  template.innerHTML = html;
+  return template.content.childNodes[0];
 }
 
 function sendMessage() {
@@ -96,6 +108,7 @@ function sendMessage() {
     console.log('File loaded');
     channel.send(selectedFile.name);
     channel.send(reader.result);
+    sentFiles.appendChild(htmlToElement(`<li>${selectedFile.name}</li>`))
   };
   reader.readAsArrayBuffer(selectedFile);
 }

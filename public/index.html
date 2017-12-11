@@ -11,16 +11,24 @@
 </head>
 <body>
   <h1>Share</h1>
+  <h3>(or <a href="scan.html">scan</a>)</h3>
 
   <canvas id="qr"></canvas>
   <div class="sent">
+    <h2>Sent files</h2>
+    <ul id="sentFiles">
+
+    </ul>
     <input type="file" id="file">
     <button id="sendButton" name="sendButton" class="buttonright" disabled>
       Send
     </button>
   </div>
   <div class="received">
-    <p><a href="#" id="download">Download</a></p>
+    <h2>Received files</h2>
+    <ul id="receivedFiles">
+
+    </ul>
   </div>
 </body>
 </html>
